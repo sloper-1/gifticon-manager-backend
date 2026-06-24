@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: gifticon-backend
+    runtime: node
+    rootDir: .
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: TLS_CERT
+        sync: false
+      - key: TLS_KEY
+        sync: false
