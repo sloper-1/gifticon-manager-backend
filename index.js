@@ -1,6 +1,7 @@
 const express = require('express');
 const { router: gifticonsRouter } = require('./routes/gifticons');
 const authRouter = require('./routes/auth');
+const ocrRouter = require('./routes/ocr');
 require('./scheduler');
 
 const app = express();
@@ -15,6 +16,7 @@ app.use((req, res, next) => {
 
 app.use('/api/login', authRouter);
 app.use('/api/gifticons', gifticonsRouter);
+app.use('/api/ocr', ocrRouter);
 app.get('/health', (_, res) => res.json({ ok: true }));
 
 const PORT = process.env.PORT ?? 3001;
