@@ -30,6 +30,27 @@ app.use('/api/gifticons', gifticonsRouter);
 app.use('/api/ocr', ocrRouter);
 app.get('/health', (_, res) => res.json({ ok: true }));
 
+// GET /debug/tls
+app.get('/debug/tls', (req, res) => {
+  const hasCert = !!process.env.TLS_CERT;
+  const hasKey = !!process.env.TLS_KEY;
+  let agentOk = false;
+  let agentError = null;
+  try {
+    const https = require('https');
+    if (hasCert && hasKey) {
+      new https.Agent({
+        cert: Buffer.from(process.env.TLS_CERT, 'base64').toString(),
+        key: Buffer.from(process.env.TLS_KEY, 'base64').toString(),
+      });
+      agentOk = true;
+    }
+  } catch (e) {
+    agentError = e.message;
+  }
+  res.json({ hasCert, hasKey, agentOk, agentError, certLen: process.env.TLS_CERT?.length, keyLen: process.env.TLS_KEY?.length });
+});
+
 // GET /debug/userkey
 app.get('/debug/userkey', (req, res) => {
   const key = getLastUserKey() || lastCapturedUserKey;
