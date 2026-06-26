@@ -1,6 +1,7 @@
 const express = require('express');
 const { router: gifticonsRouter } = require('./routes/gifticons');
 const authRouter = require('./routes/auth');
+const { getLastUserKey } = require('./routes/auth');
 const ocrRouter = require('./routes/ocr');
 const { sendPush } = require('./push');
 require('./scheduler');
@@ -19,6 +20,13 @@ app.use('/api/login', authRouter);
 app.use('/api/gifticons', gifticonsRouter);
 app.use('/api/ocr', ocrRouter);
 app.get('/health', (_, res) => res.json({ ok: true }));
+
+// GET /debug/userkey — 마지막 로그인 userKey 반환
+app.get('/debug/userkey', (req, res) => {
+  const userKey = getLastUserKey();
+  if (!userKey) return res.status(404).json({ error: 'no login yet' });
+  res.json({ userKey });
+});
 
 // POST /test-push { userKey, brand?, name?, daysLeft? }
 app.post('/test-push', async (req, res) => {

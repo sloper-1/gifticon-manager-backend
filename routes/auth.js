@@ -2,6 +2,9 @@ const express = require('express');
 const https = require('https');
 const router = express.Router();
 
+let lastUserKey = null;
+function getLastUserKey() { return lastUserKey; }
+
 const TOKEN_URL = 'https://apps-in-toss-api.toss.im/api-partner/v1/apps-in-toss/oauth2/token';
 
 function buildTlsAgent() {
@@ -53,6 +56,7 @@ router.post('/', async (req, res) => {
 
     const { userKey } = JSON.parse(raw);
     if (!userKey) return res.status(401).json({ error: 'login failed' });
+    lastUserKey = userKey;
     res.json({ userKey });
   } catch (err) {
     console.error('[auth]', err);
@@ -61,3 +65,4 @@ router.post('/', async (req, res) => {
 });
 
 module.exports = router;
+module.exports.getLastUserKey = getLastUserKey;
