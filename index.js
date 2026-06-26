@@ -75,6 +75,15 @@ app.post('/test-push', async (req, res) => {
   }
 });
 
+// POST /debug/log { message }
+let lastDebugLog = null;
+app.post('/debug/log', (req, res) => {
+  lastDebugLog = req.body?.message ?? '(empty)';
+  console.log('[debug/log]', lastDebugLog);
+  res.json({ ok: true });
+});
+app.get('/debug/log', (req, res) => res.json({ log: lastDebugLog }));
+
 const PORT = process.env.PORT ?? 3001;
 init().then(() => {
   app.listen(PORT, () => console.log(`[gifticon-backend] listening on ${PORT}`));
