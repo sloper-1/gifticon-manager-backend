@@ -17,24 +17,22 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api/login', authRouter);
-app.use('/api/gifticons', gifticonsRouter);
-app.use('/api/ocr', ocrRouter);
-app.get('/health', (_, res) => res.json({ ok: true }));
-
-// 모든 /api/* 요청에서 userKey 캡처
+// userKey 캡처 — 라우트보다 먼저 등록
+let lastCapturedUserKey = null;
 app.use('/api', (req, res, next) => {
   const userKey = req.headers['authorization']?.replace('Bearer ', '');
   if (userKey) lastCapturedUserKey = userKey;
   next();
 });
 
-let lastCapturedUserKey = null;
+app.use('/api/login', authRouter);
+app.use('/api/gifticons', gifticonsRouter);
+app.use('/api/ocr', ocrRouter);
+app.get('/health', (_, res) => res.json({ ok: true }));
 
 // GET /debug/userkey
 app.get('/debug/userkey', (req, res) => {
-  const fromLogin = getLastUserKey();
-  const key = fromLogin || lastCapturedUserKey;
+  const key = getLastUserKey() || lastCapturedUserKey;
   if (!key) return res.status(404).json({ error: 'no request yet' });
   res.json({ userKey: key });
 });
