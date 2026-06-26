@@ -4,6 +4,7 @@ const authRouter = require('./routes/auth');
 const { getLastUserKey } = require('./routes/auth');
 const ocrRouter = require('./routes/ocr');
 const { sendPush } = require('./push');
+const { init } = require('./db');
 require('./scheduler');
 
 const app = express();
@@ -41,4 +42,9 @@ app.post('/test-push', async (req, res) => {
 });
 
 const PORT = process.env.PORT ?? 3001;
-app.listen(PORT, () => console.log(`[gifticon-backend] listening on ${PORT}`));
+init().then(() => {
+  app.listen(PORT, () => console.log(`[gifticon-backend] listening on ${PORT}`));
+}).catch((err) => {
+  console.error('[db] init failed', err);
+  process.exit(1);
+});

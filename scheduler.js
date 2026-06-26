@@ -13,7 +13,7 @@ function daysLeft(iso) {
 // 매일 09:00 KST = UTC 00:00 (UTC+9)
 cron.schedule('0 0 * * *', async () => {
   console.log('[scheduler] 만료 임박 푸시 발송 시작');
-  const gifticons = getAllGifticons().filter((g) => !g.used);
+  const gifticons = await getAllGifticons();
 
   for (const g of gifticons) {
     const d = daysLeft(g.expiry);
