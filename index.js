@@ -1,7 +1,7 @@
 const express = require('express');
 const { router: gifticonsRouter } = require('./routes/gifticons');
 const authRouter = require('./routes/auth');
-const { getLastUserKey } = require('./routes/auth');
+const { getLastUserKey, getLastAuthResult } = require('./routes/auth');
 const ocrRouter = require('./routes/ocr');
 const { sendPush } = require('./push');
 const { init } = require('./db');
@@ -49,6 +49,11 @@ app.get('/debug/tls', (req, res) => {
     agentError = e.message;
   }
   res.json({ hasCert, hasKey, agentOk, agentError, certLen: process.env.TLS_CERT?.length, keyLen: process.env.TLS_KEY?.length });
+});
+
+// GET /debug/auth-result
+app.get('/debug/auth-result', (req, res) => {
+  res.json({ result: getLastAuthResult() });
 });
 
 // GET /debug/userkey

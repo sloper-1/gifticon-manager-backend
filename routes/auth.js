@@ -3,7 +3,9 @@ const https = require('https');
 const router = express.Router();
 
 let lastUserKey = null;
+let lastAuthResult = null;
 function getLastUserKey() { return lastUserKey; }
+function getLastAuthResult() { return lastAuthResult; }
 
 const TOKEN_URL = 'https://apps-in-toss-api.toss.im/api-partner/v1/apps-in-toss/oauth2/token';
 
@@ -59,9 +61,9 @@ router.post('/', async (req, res) => {
       r.end();
     });
 
-    console.log('[auth] AIT token response:', raw.slice(0, 200));
+    lastAuthResult = raw.slice(0, 500);
     const { userKey } = JSON.parse(raw);
-    if (!userKey) return res.status(401).json({ error: 'login failed' });
+    if (!userKey) return res.status(401).json({ error: 'login failed', aitResponse: raw.slice(0, 200) });
     lastUserKey = userKey;
     res.json({ userKey });
   } catch (err) {
@@ -72,3 +74,4 @@ router.post('/', async (req, res) => {
 
 module.exports = router;
 module.exports.getLastUserKey = getLastUserKey;
+module.exports.getLastAuthResult = getLastAuthResult;
