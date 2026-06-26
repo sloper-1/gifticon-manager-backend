@@ -6,7 +6,7 @@ const { sendPush } = require('./push');
 require('./scheduler');
 
 const app = express();
-app.use(express.json({ limit: '10mb' })); // base64 이미지 허용
+app.use(express.json({ limit: '10mb' }));
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -20,7 +20,7 @@ app.use('/api/gifticons', gifticonsRouter);
 app.use('/api/ocr', ocrRouter);
 app.get('/health', (_, res) => res.json({ ok: true }));
 
-// 테스트 푸시 발송: POST /test-push { userKey, brand?, name?, daysLeft? }
+// POST /test-push { userKey, brand?, name?, daysLeft? }
 app.post('/test-push', async (req, res) => {
   const { userKey, brand = '스타벅스', name = '아메리카노', daysLeft = 1 } = req.body;
   if (!userKey) return res.status(400).json({ error: 'userKey required' });
