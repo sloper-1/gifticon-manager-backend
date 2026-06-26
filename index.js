@@ -22,11 +22,21 @@ app.use('/api/gifticons', gifticonsRouter);
 app.use('/api/ocr', ocrRouter);
 app.get('/health', (_, res) => res.json({ ok: true }));
 
-// GET /debug/userkey — 마지막 로그인 userKey 반환
+// 모든 /api/* 요청에서 userKey 캡처
+app.use('/api', (req, res, next) => {
+  const userKey = req.headers['authorization']?.replace('Bearer ', '');
+  if (userKey) lastCapturedUserKey = userKey;
+  next();
+});
+
+let lastCapturedUserKey = null;
+
+// GET /debug/userkey
 app.get('/debug/userkey', (req, res) => {
-  const userKey = getLastUserKey();
-  if (!userKey) return res.status(404).json({ error: 'no login yet' });
-  res.json({ userKey });
+  const fromLogin = getLastUserKey();
+  const key = fromLogin || lastCapturedUserKey;
+  if (!key) return res.status(404).json({ error: 'no request yet' });
+  res.json({ userKey: key });
 });
 
 // POST /test-push { userKey, brand?, name?, daysLeft? }
