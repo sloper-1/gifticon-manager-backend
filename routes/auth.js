@@ -22,9 +22,14 @@ router.post('/', async (req, res) => {
   const { authorizationCode, referrer } = req.body;
   if (!authorizationCode) return res.status(400).json({ error: 'missing authorizationCode' });
 
-  const agent = buildTlsAgent();
+  let agent;
+  try {
+    agent = buildTlsAgent();
+  } catch (e) {
+    console.error('[auth] buildTlsAgent error:', e.message);
+  }
   if (!agent) {
-    // 개발 환경(TLS 없음)에서는 authCode 자체를 userKey로 사용
+    console.warn('[auth] no TLS agent, using dev fallback. TLS_CERT set:', !!process.env.TLS_CERT, 'TLS_KEY set:', !!process.env.TLS_KEY);
     return res.json({ userKey: `dev_${authorizationCode.slice(0, 8)}` });
   }
 
@@ -54,6 +59,7 @@ router.post('/', async (req, res) => {
       r.end();
     });
 
+    console.log('[auth] AIT token response:', raw.slice(0, 200));
     const { userKey } = JSON.parse(raw);
     if (!userKey) return res.status(401).json({ error: 'login failed' });
     lastUserKey = userKey;
