@@ -2,11 +2,14 @@
   "name": "gipkon-backend",
   "version": "0.1.0",
   "type": "commonjs",
-  "scripts": { "start": "node index.js" },
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
+    "@supabase/supabase-js": "^2.108.2",
     "express": "^4.21.2",
     "node-cron": "^3.0.3",
-    "pg": "^8.13.3",
+    "pg": "^8.22.0",
     "uuid": "^11.0.5"
   }
 }

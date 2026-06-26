@@ -1,25 +1,17 @@
-const { Pool } = require('pg');
+const { createClient } = require('@supabase/supabase-js');
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-});
+const supabase = createClient(
+  'https://vocsjgkigxiunkpbsqws.supabase.co',
+  process.env.SUPABASE_SECRET_KEY
+);
 
 async function init() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS gifticons (
-      id TEXT PRIMARY KEY,
-      user_key TEXT NOT NULL,
-      brand TEXT NOT NULL,
-      name TEXT NOT NULL,
-      expiry TEXT NOT NULL,
-      image_url TEXT,
-      thumbnail_url TEXT,
-      barcode_number TEXT,
-      used BOOLEAN DEFAULT FALSE,
-      created_at TIMESTAMP DEFAULT NOW()
-    )
-  `);
+  // 테이블이 없으면 Supabase SQL Editor에서 직접 생성해야 함
+  // 여기서는 연결만 확인
+  const { error } = await supabase.from('gifticons').select('id').limit(1);
+  if (error && error.code !== 'PGRST116') {
+    throw new Error(`DB init failed: ${error.message}`);
+  }
 }
 
-module.exports = { pool, init };
+module.exports = { supabase, init };
