@@ -54,6 +54,7 @@ router.post('/', async (req, res) => {
 
   const partnerApiKey = process.env.PARTNER_API_KEY;
   if (!partnerApiKey) {
+    lastAuthResult = 'ERROR:PARTNER_API_KEY_NOT_SET';
     console.warn('[auth] PARTNER_API_KEY not set, using dev fallback');
     return res.json({ userKey: `dev_${authorizationCode.slice(0, 8)}` });
   }
