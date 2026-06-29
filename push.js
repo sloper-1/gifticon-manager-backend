@@ -21,7 +21,7 @@ async function sendPush(userKey, brand, name, daysLeft) {
   const label = daysLeft === 0 ? '오늘' : `${daysLeft}일 뒤`;
   const body = JSON.stringify({
     userKey,
-    templateCode: 'gifticon-EXPIRY_REMINDER',
+    templateCode: 'gifticon-manager-gifticon-EXPIRY_REMINDER',
     variables: { brand, name, label },
   });
 
