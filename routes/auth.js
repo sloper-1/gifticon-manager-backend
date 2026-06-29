@@ -10,10 +10,19 @@ function getLastAuthResult() { return lastAuthResult; }
 const TOKEN_URL = 'https://apps-in-toss-api.toss.im/api-partner/v1/apps-in-toss/user/oauth2/generate-token';
 const ME_URL = 'https://apps-in-toss-api.toss.im/api-partner/v1/apps-in-toss/user/oauth2/login-me';
 
+function buildTlsAgent() {
+  if (!process.env.TLS_CERT || !process.env.TLS_KEY) return undefined;
+  return new https.Agent({
+    cert: Buffer.from(process.env.TLS_CERT, 'base64').toString(),
+    key: Buffer.from(process.env.TLS_KEY, 'base64').toString(),
+  });
+}
+
 function httpsGet(url, headers) {
   const u = new URL(url);
+  const agent = buildTlsAgent();
   return new Promise((resolve, reject) => {
-    const r = https.request({ hostname: u.hostname, path: u.pathname, method: 'GET', headers }, (resp) => {
+    const r = https.request({ hostname: u.hostname, path: u.pathname, method: 'GET', headers, agent }, (resp) => {
       let d = '';
       resp.on('data', (chunk) => (d += chunk));
       resp.on('end', () => resolve(d));
@@ -25,6 +34,7 @@ function httpsGet(url, headers) {
 
 function httpsPost(url, headers, body) {
   const u = new URL(url);
+  const agent = buildTlsAgent();
   return new Promise((resolve, reject) => {
     const r = https.request(
       {
@@ -32,6 +42,7 @@ function httpsPost(url, headers, body) {
         path: u.pathname,
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body), ...headers },
+        agent,
       },
       (resp) => {
         let d = '';
@@ -88,8 +99,9 @@ router.post('/', async (req, res) => {
     lastUserKey = String(userKey);
     res.json({ userKey: String(userKey) });
   } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
     console.error('[auth]', err);
-    res.status(500).json({ error: 'internal error' });
+    res.status(500).json({ error: 'internal error', detail: msg });
   }
 });
 
