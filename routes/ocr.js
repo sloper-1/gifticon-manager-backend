@@ -25,7 +25,7 @@ function callVisionApi(b64Image) {
         const json = JSON.parse(data);
         if (json.error) return reject(new Error(json.error.message));
         const text = json.responses?.[0]?.textAnnotations?.[0]?.description ?? '';
-        resolve(text);
+        resolve(text.normalize('NFC'));
       });
     });
     req.on('error', reject);
