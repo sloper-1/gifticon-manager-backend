@@ -35,6 +35,7 @@ async function sendPush(userKey, brand, name, daysLeft) {
         headers: {
           'Content-Type': 'application/json',
           'Content-Length': Buffer.byteLength(body),
+          Authorization: `Bearer ${process.env.PARTNER_API_KEY}`,
         },
         agent,
       },
