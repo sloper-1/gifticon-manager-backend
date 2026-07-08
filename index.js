@@ -5,7 +5,7 @@ const { getLastUserKey, getLastAuthResult } = require('./routes/auth');
 const ocrRouter = require('./routes/ocr');
 const { sendPush } = require('./push');
 const { init } = require('./db');
-require('./scheduler');
+const { runPushCheck } = require('./scheduler');
 
 const app = express();
 app.use(express.json({ limit: '10mb' }));
@@ -70,6 +70,16 @@ app.post('/test-push', async (req, res) => {
   try {
     const result = await sendPush(userKey, brand, name, daysLeft);
     res.json({ ok: true, result });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// POST /debug/run-push-check — 스케줄러 로직을 즉시 실행
+app.post('/debug/run-push-check', async (req, res) => {
+  try {
+    const result = await runPushCheck();
+    res.json({ ok: true, ...result });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }

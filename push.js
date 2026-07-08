@@ -10,7 +10,6 @@ function buildTlsAgent() {
   });
 }
 
-// 정확한 request body 구조는 AIT 콘솔 메시지 템플릿 등록 화면에서 확인 후 수정
 async function sendPush(userKey, brand, name, daysLeft) {
   const agent = buildTlsAgent();
   if (!agent) {
@@ -20,9 +19,8 @@ async function sendPush(userKey, brand, name, daysLeft) {
 
   const label = daysLeft === 0 ? '오늘' : `${daysLeft}일 뒤`;
   const body = JSON.stringify({
-    userKey,
-    templateCode: 'gifticon-manager-gifticon-EXPIRY_REMINDER',
-    variables: { brand, name, label },
+    templateSetCode: 'gifticon-manager-gifticon-EXPIRY_REMINDER',
+    context: { brand, name, label },
   });
 
   return new Promise((resolve, reject) => {
@@ -35,7 +33,7 @@ async function sendPush(userKey, brand, name, daysLeft) {
         headers: {
           'Content-Type': 'application/json',
           'Content-Length': Buffer.byteLength(body),
-          Authorization: `Bearer ${process.env.PARTNER_API_KEY}`,
+          'x-toss-user-key': userKey,
         },
         agent,
       },
